@@ -12,7 +12,7 @@ public enum Error {
   UN_AUTHORIZED(1001, "User is un-authorize to access this resource"),
   USER_ALREADY_EXIST(1002, "User already exist"),
   EMAIL_ALREADY_EXIST(1003, "Email already exist"),
-  USER_NOT_FOUND(1004, "User not found");
+  USER_NOT_FOUND(1004, "User not found, sorry...");
 
   private int code;
   private String message;

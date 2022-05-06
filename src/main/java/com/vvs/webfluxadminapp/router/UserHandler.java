@@ -1,6 +1,7 @@
 package com.vvs.webfluxadminapp.router;
 
 import com.vvs.webfluxadminapp.dto.UserDto;
+import com.vvs.webfluxadminapp.error.exception.UserNotFoundException;
 import com.vvs.webfluxadminapp.security.JwtUtil;
 import com.vvs.webfluxadminapp.service.UserService;
 
@@ -30,14 +31,14 @@ public class UserHandler {
         .body(userService.getUsers(), UserDto.class));
   }
 
-  public Mono<ServerResponse> getUser(ServerRequest request) {
+  public Mono<ServerResponse> getUser(ServerRequest request) throws UserNotFoundException {
     String token = request.headers().firstHeader("authorization").substring(7);
     String username = request.pathVariable("username");
     return jwtUtil.getAllClaimsFromToken(token)
       .flatMap(cradentials -> ServerResponse
-      .ok()
-      .contentType(APPLICATION_JSON)
-      .body(userService.getUser(username), UserDto.class));
+        .ok()
+        .contentType(APPLICATION_JSON)
+        .body(userService.getUser(username), UserDto.class));
   }
 
   public Mono<ServerResponse> updateUserData(ServerRequest request) {
