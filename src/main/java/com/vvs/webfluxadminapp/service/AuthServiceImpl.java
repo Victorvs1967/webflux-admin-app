@@ -4,6 +4,7 @@ import com.vvs.webfluxadminapp.dto.ResponseDto;
 import com.vvs.webfluxadminapp.dto.UserDto;
 import com.vvs.webfluxadminapp.error.exception.EmailAlreadyExistException;
 import com.vvs.webfluxadminapp.error.exception.UserAlreadyExistException;
+import com.vvs.webfluxadminapp.error.exception.UserNotFoundException;
 import com.vvs.webfluxadminapp.error.exception.WrongCredentialException;
 import com.vvs.webfluxadminapp.mapper.UserMapper;
 import com.vvs.webfluxadminapp.repository.UserRepository;
@@ -32,19 +33,20 @@ public class AuthServiceImpl implements AuthService {
     return isUserExist(userDto.getUsername())
       .filter(userExist -> !userExist)
       .switchIfEmpty(Mono.error(UserAlreadyExistException::new))
-      .doOnNext(_Boolean -> isEmailExist(userDto.getEmail())
-        .filter(emailExist -> !emailExist)
-        .switchIfEmpty(Mono.error(EmailAlreadyExistException::new)))
+      .doOnNext(_Boolean -> isEmailExist(userDto.getEmail()))
+      .filter(emailExist -> !emailExist)
+      .switchIfEmpty(Mono.error(EmailAlreadyExistException::new))
       .map(aBoolean -> userDto)
       .map(userMapper::fromDto)
       .doOnNext(user -> user.setPassword(passwordEncoder.encode(user.getPassword())))
       .flatMap(userRepository::save)
       .map(userMapper::toDto);
-  }
+}
 
   @Override
   public Mono<ResponseDto> login(String username, String password) {
     return userRepository.findUserByUsername(username)
+      .switchIfEmpty(Mono.error(UserNotFoundException::new))
       .filter(userDetails -> passwordEncoder.matches(password, userDetails.getPassword()))
       .map(userDetails -> jwtUtil.generateToken(userDetails))
       .map(token -> ResponseDto.builder()

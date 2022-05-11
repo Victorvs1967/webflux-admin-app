@@ -11,6 +11,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import com.vvs.webfluxadminapp.dto.LoginDto;
 import com.vvs.webfluxadminapp.dto.ResponseDto;
 import com.vvs.webfluxadminapp.dto.UserDto;
+import com.vvs.webfluxadminapp.error.exception.WrongCredentialException;
 import com.vvs.webfluxadminapp.service.AuthService;
 
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,11 +1,9 @@
 package com.vvs.webfluxadminapp.error;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Getter;
 
 @Getter
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Error {
   
   WRONG_CREDENTIALS(1000, "Wrong credentials"),

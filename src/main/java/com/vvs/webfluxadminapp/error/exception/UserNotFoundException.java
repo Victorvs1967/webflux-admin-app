@@ -2,15 +2,10 @@ package com.vvs.webfluxadminapp.error.exception;
 
 import com.vvs.webfluxadminapp.error.Error;
 
-import lombok.Data;
-
-@Data
 public class UserNotFoundException extends RuntimeException {
-  private final String username;
-  private static final Error error = Error.USER_NOT_FOUND;
+  private final static String error = Error.USER_NOT_FOUND.getMessage();
 
-  public UserNotFoundException(String username) {
-    super(error.getMessage());
-    this.username = username;
+  public UserNotFoundException() {
+    super(error);
   }
 }

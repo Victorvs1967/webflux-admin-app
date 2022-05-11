@@ -26,20 +26,20 @@ public class UserServiceImpl implements UserService {
   @Override
   public Mono<UserDto> getUser(String username) {
     return userRepository.findUserByUsername(username)
-      .switchIfEmpty(Mono.error(new UserNotFoundException(username)))
-      .map(userMapper::toDto);
+        .switchIfEmpty(Mono.error(UserNotFoundException::new))
+        .map(userMapper::toDto);
   }
 
   @Override
   public Flux<UserDto> getUsers() {
     return userRepository.findAll()
-      .map(userMapper::toDto);
+        .map(userMapper::toDto);
   }
 
   @Override
   public Mono<UserDto> updateUserData(UserDto userDto) {
     return userRepository.findUserByUsername(userDto.getUsername())
-      .switchIfEmpty(Mono.error(() -> new UserNotFoundException(userDto.getUsername())))
+      .switchIfEmpty(Mono.error(UserNotFoundException::new))
       .map(user -> User.builder()
         .id(user.getId())
         .username(user.getUsername())
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public Mono<Void> deleteUser(String username) {
     return userRepository.findUserByUsername(username)
-      .switchIfEmpty(Mono.error(() -> new UserNotFoundException(username)))
+      .switchIfEmpty(Mono.error(UserNotFoundException::new))
       .flatMap(userRepository::delete);
   }
 }

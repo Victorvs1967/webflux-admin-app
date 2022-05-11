@@ -1,7 +1,7 @@
 package com.vvs.webfluxadminapp.router;
 
 import com.vvs.webfluxadminapp.dto.UserDto;
-import com.vvs.webfluxadminapp.error.exception.UserNotFoundException;
+import com.vvs.webfluxadminapp.error.exception.WrongCredentialException;
 import com.vvs.webfluxadminapp.security.JwtUtil;
 import com.vvs.webfluxadminapp.service.UserService;
 
@@ -24,27 +24,38 @@ public class UserHandler {
 
   public Mono<ServerResponse> getUsers(ServerRequest request) {
     String token = request.headers().firstHeader("authorization").substring(7);
-    return jwtUtil.getAllClaimsFromToken(token)
+    return jwtUtil.validateToken(token)
+      .map(result -> !result)
+      .switchIfEmpty(Mono.error(WrongCredentialException::new))
       .flatMap(credentials -> ServerResponse
         .ok()
         .contentType(APPLICATION_JSON)
         .body(userService.getUsers(), UserDto.class));
   }
 
-  public Mono<ServerResponse> getUser(ServerRequest request) throws UserNotFoundException {
+  public Mono<ServerResponse> getUser(ServerRequest request) {
     String token = request.headers().firstHeader("authorization").substring(7);
     String username = request.pathVariable("username");
-    return jwtUtil.getAllClaimsFromToken(token)
-      .flatMap(cradentials -> ServerResponse
+    return jwtUtil.validateToken(token)
+      .map(result -> !result)
+      .switchIfEmpty(Mono.error(WrongCredentialException::new))
+      .map(isUsername -> username)
+      .map(userService::getUser)
+      .flatMap(user -> ServerResponse
         .ok()
         .contentType(APPLICATION_JSON)
-        .body(userService.getUser(username), UserDto.class));
+        .body(user, UserDto.class));
   }
 
   public Mono<ServerResponse> updateUserData(ServerRequest request) {
     String token = request.headers().firstHeader("authorization").substring(7);
+    String username = request.pathVariable("username");
     Mono<UserDto> userDto = request.bodyToMono(UserDto.class);
-    return jwtUtil.getAllClaimsFromToken(token)
+    return jwtUtil.validateToken(token)
+      .map(result -> !result)
+      .switchIfEmpty(Mono.error(WrongCredentialException::new))
+      .map(isUsername -> username)
+      .map(userService::getUser)
       .flatMap(credentials -> userDto
         .map(userService::updateUserData)
         .flatMap(user -> ServerResponse
@@ -56,10 +67,14 @@ public class UserHandler {
   public Mono<ServerResponse> deleteUser(ServerRequest request) {
     String token = request.headers().firstHeader("authorization").substring(7);
     String username = request.pathVariable("username");
-    return jwtUtil.getAllClaimsFromToken(token)
-      .flatMap(credentials -> ServerResponse
-        .noContent()
-        .build(userService.deleteUser(username)));
+    return jwtUtil.validateToken(token)
+      .map(result -> !result)
+      .switchIfEmpty(Mono.error(WrongCredentialException::new))
+      .flatMap(credentials -> Mono.just(username)
+        .map(userService::deleteUser)
+        .flatMap(user -> ServerResponse
+          .noContent()
+          .build()));
   }
   
 }
