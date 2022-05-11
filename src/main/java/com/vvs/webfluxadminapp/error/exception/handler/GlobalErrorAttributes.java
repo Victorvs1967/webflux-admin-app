@@ -37,8 +37,8 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
 
   @Override
   public Map<String, Object> getErrorAttributes(ServerRequest request, ErrorAttributeOptions options) {
-    // Map<String, Object> errorAttributes = super.getErrorAttributes(request, options);
     Throwable error = getError(request);
+
     final String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
 
     Optional<ExceptionRule> exceptionRuleOptional = exceptionRules.stream()
@@ -46,18 +46,28 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
       .filter(Objects::nonNull)
       .findFirst();
 
-    // errorAttributes.put("status", HttpStatus.BAD_REQUEST);
-    // errorAttributes.put("message", error.getMessage());
-    // errorAttributes.remove("timestamp");
-    // errorAttributes.remove("error");
-    // errorAttributes.remove("requestId");
-    // return errorAttributes;
-    return exceptionRuleOptional.<Map<String, Object>>map(exceptionRule -> Map.of(ErrorAttributesKey.CODE.getKey(), exceptionRule.status().getCode(), ErrorAttributesKey.MESSAGE.getKey(), error.getMessage(),  ErrorAttributesKey.TIME.getKey(), timestamp))
-      .orElseGet(() -> Map.of(ErrorAttributesKey.CODE.getKey(), determineHttpStatus(error).value(),  ErrorAttributesKey.MESSAGE.getKey(), error.getMessage(), ErrorAttributesKey.TIME.getKey(), timestamp));
+    return exceptionRuleOptional.<Map<String, Object>>map(exceptionRule -> Map.of(
+        ErrorAttributesKey.CODE.getKey(), 
+        exceptionRule.status().getCode(), 
+        ErrorAttributesKey.MESSAGE.getKey(), 
+        error.getMessage(),  
+        ErrorAttributesKey.TIME.getKey(), 
+        timestamp))
+      .orElseGet(() -> Map.of(
+        ErrorAttributesKey.CODE.getKey(), 
+        determineHttpStatus(error).value(),
+        ErrorAttributesKey.MESSAGE.getKey(), 
+        error.getMessage(), ErrorAttributesKey.TIME.getKey(), 
+        timestamp));
   }
   
   private HttpStatus determineHttpStatus(Throwable error) {
-    return error instanceof ResponseStatusException err ? err.getStatus() : MergedAnnotations.from(error.getClass(), MergedAnnotations.SearchStrategy.TYPE_HIERARCHY).get(ResponseStatus.class).getValue(ErrorAttributesKey.CODE.getKey(), HttpStatus.class).orElse(HttpStatus.INTERNAL_SERVER_ERROR);
+    return error instanceof ResponseStatusException err ? 
+      err.getStatus() : 
+      MergedAnnotations.from(error.getClass(), MergedAnnotations.SearchStrategy.TYPE_HIERARCHY)
+        .get(ResponseStatus.class)
+        .getValue(ErrorAttributesKey.CODE.getKey(), HttpStatus.class)
+        .orElse(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
 }

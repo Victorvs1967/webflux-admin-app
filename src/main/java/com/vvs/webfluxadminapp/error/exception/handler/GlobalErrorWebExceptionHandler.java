@@ -2,6 +2,7 @@ package com.vvs.webfluxadminapp.error.exception.handler;
 
 import java.util.Map;
 
+import com.vvs.webfluxadminapp.error.Error;
 import com.vvs.webfluxadminapp.error.ErrorAttributesKey;
 
 import org.springframework.boot.autoconfigure.web.WebProperties;
@@ -42,7 +43,7 @@ public class GlobalErrorWebExceptionHandler extends AbstractErrorWebExceptionHan
     Map<String, Object> errorProperties = getErrorAttributes(request, ErrorAttributeOptions.defaults());
     int statusCode = Integer.parseInt(errorProperties.get(ErrorAttributesKey.CODE.getKey()).toString());
     return ServerResponse
-      .status(HttpStatus.BAD_REQUEST)
+      .badRequest()
       .contentType(MediaType.APPLICATION_JSON)
       .body(BodyInserters.fromValue(errorProperties));
   } 

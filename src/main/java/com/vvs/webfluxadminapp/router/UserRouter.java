@@ -14,11 +14,11 @@ public class UserRouter {
   @Bean
   public RouterFunction<ServerResponse> userRouterFunction(UserHandler userHandler) {
     return route()
-      .nest(path("/api"), builder -> builder
-        .GET("/users", userHandler::getUsers)
-        .GET("/users/{username}", userHandler::getUser)
-        .PUT("/users/{username}", userHandler::updateUserData)
-        .DELETE("/users/{username}", userHandler::deleteUser))
+      .nest(path("/api/users"), builder -> builder
+        .GET("", userHandler::getUsers)
+        .GET("/{username}", userHandler::getUser)
+        .PUT("/{username}", userHandler::updateUserData)
+        .DELETE("/{username}", userHandler::deleteUser))
       .build();
   }
 }
