@@ -14,9 +14,9 @@ public class AuthRouter {
   @Bean
   public RouterFunction<ServerResponse> authRouterFunction(AuthHandler authHandler) {
     return route()
-      .nest(path("/auth/"), builder -> builder
-        .POST("signup", authHandler::signUp)
-        .POST("login", authHandler::login))
+      .nest(path("/auth"), builder -> builder
+        .POST("/signup", authHandler::signUp)
+        .POST("/login", authHandler::login))
       .build();
   }
 }
