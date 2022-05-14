@@ -1,6 +1,7 @@
 package com.vvs.webfluxadminapp.router;
 
 import com.vvs.webfluxadminapp.dto.UserDto;
+import com.vvs.webfluxadminapp.error.exception.UserNotFoundException;
 import com.vvs.webfluxadminapp.error.exception.WrongCredentialException;
 import com.vvs.webfluxadminapp.security.JwtUtil;
 import com.vvs.webfluxadminapp.service.UserService;
@@ -37,10 +38,11 @@ public class UserHandler {
     String token = request.headers().firstHeader("authorization").substring(7);
     String username = request.pathVariable("username");
     return jwtUtil.validateToken(token)
-      .map(result -> !result)
       .switchIfEmpty(Mono.error(WrongCredentialException::new))
+      .map(result -> !result)
       .map(isUsername -> username)
       .map(userService::getUser)
+      .switchIfEmpty(Mono.error(UserNotFoundException::new))
       .flatMap(user -> ServerResponse
         .ok()
         .contentType(APPLICATION_JSON)
@@ -52,10 +54,11 @@ public class UserHandler {
     String username = request.pathVariable("username");
     Mono<UserDto> userDto = request.bodyToMono(UserDto.class);
     return jwtUtil.validateToken(token)
-      .map(result -> !result)
       .switchIfEmpty(Mono.error(WrongCredentialException::new))
+      .map(result -> !result)
       .map(isUsername -> username)
       .map(userService::getUser)
+      .switchIfEmpty(Mono.error(UserNotFoundException::new))
       .flatMap(credentials -> userDto
         .map(userService::updateUserData)
         .flatMap(user -> ServerResponse
@@ -68,10 +71,11 @@ public class UserHandler {
     String token = request.headers().firstHeader("authorization").substring(7);
     String username = request.pathVariable("username");
     return jwtUtil.validateToken(token)
-      .map(result -> !result)
       .switchIfEmpty(Mono.error(WrongCredentialException::new))
+      .map(result -> !result)
       .flatMap(credentials -> Mono.just(username)
         .map(userService::deleteUser)
+        .switchIfEmpty(Mono.error(UserNotFoundException::new))
         .flatMap(user -> ServerResponse
           .noContent()
           .build()));

@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 
 import static com.vvs.webfluxadminapp.security.JwtUtil.KEY_ROLE;
 
-import java.util.Collections; 
+import java.util.Collections;
 
 @Component
 public class AuthenticationManager implements ReactiveAuthenticationManager {

@@ -4,8 +4,6 @@ import com.vvs.webfluxadminapp.dto.ResponseDto;
 import com.vvs.webfluxadminapp.dto.UserDto;
 import com.vvs.webfluxadminapp.error.exception.EmailAlreadyExistException;
 import com.vvs.webfluxadminapp.error.exception.UserAlreadyExistException;
-import com.vvs.webfluxadminapp.error.exception.UserNotFoundException;
-import com.vvs.webfluxadminapp.error.exception.WrongCredentialException;
 import com.vvs.webfluxadminapp.mapper.UserMapper;
 import com.vvs.webfluxadminapp.repository.UserRepository;
 import com.vvs.webfluxadminapp.security.JwtUtil;
@@ -46,13 +44,11 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public Mono<ResponseDto> login(String username, String password) {
     return userRepository.findUserByUsername(username)
-      .switchIfEmpty(Mono.error(UserNotFoundException::new))
       .filter(userDetails -> passwordEncoder.matches(password, userDetails.getPassword()))
       .map(userDetails -> jwtUtil.generateToken(userDetails))
       .map(token -> ResponseDto.builder()
         .token(token)
-        .build())
-      .switchIfEmpty(Mono.error(WrongCredentialException::new));
+        .build());
   }
 
   private Mono<Boolean> isUserExist(String username) {

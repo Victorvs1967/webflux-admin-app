@@ -71,7 +71,7 @@ public class JwtUtil {
         .build()
         .parseClaimsJws(token)
         .getBody()
-    );
+      );
   }
 
   private Key getKey() {

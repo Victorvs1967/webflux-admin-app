@@ -1,10 +1,9 @@
 package com.vvs.webfluxadminapp.security;
 
-import javax.annotation.Resources;
+import com.vvs.webfluxadminapp.error.exception.WrongCredentialException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -47,7 +46,8 @@ public class SecurityConfig {
       .cors().configurationSource(creatConfigurationSource()).and()
       .exceptionHandling()
       .authenticationEntryPoint((shs, e) -> Mono.fromRunnable(() -> shs.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED)))
-      .accessDeniedHandler((shs, e) -> Mono.fromRunnable(() -> shs.getResponse().setStatusCode(HttpStatus.FORBIDDEN))).and()
+      .accessDeniedHandler((shs, e) -> Mono.fromRunnable(() -> shs.getResponse().setStatusCode(HttpStatus.FORBIDDEN)))
+      .and()
       .csrf().disable()
       .formLogin().disable()
       .authenticationManager(authenticationManager)

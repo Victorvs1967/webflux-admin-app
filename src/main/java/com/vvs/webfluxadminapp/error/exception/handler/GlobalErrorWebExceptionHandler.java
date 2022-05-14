@@ -43,7 +43,7 @@ public class GlobalErrorWebExceptionHandler extends AbstractErrorWebExceptionHan
     Map<String, Object> errorProperties = getErrorAttributes(request, ErrorAttributeOptions.defaults());
     int statusCode = Integer.parseInt(errorProperties.get(ErrorAttributesKey.CODE.getKey()).toString());
     return ServerResponse
-      .badRequest()
+      .status(statusCode)
       .contentType(MediaType.APPLICATION_JSON)
       .body(BodyInserters.fromValue(errorProperties));
   } 

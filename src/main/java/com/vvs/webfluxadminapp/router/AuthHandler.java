@@ -35,7 +35,8 @@ public class AuthHandler {
 
   public Mono<ServerResponse> login(ServerRequest request) {
     Mono<ResponseDto> response = request.bodyToMono(LoginDto.class)
-      .flatMap(credentials -> authService.login(credentials.getUsername(), credentials.getPassword()));
+      .flatMap(credentials -> authService.login(credentials.getUsername(), credentials.getPassword()))
+      .switchIfEmpty(Mono.error(WrongCredentialException::new));
 
     return ServerResponse
       .ok()

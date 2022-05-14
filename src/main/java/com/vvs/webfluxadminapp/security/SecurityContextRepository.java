@@ -1,5 +1,7 @@
 package com.vvs.webfluxadminapp.security;
 
+import com.vvs.webfluxadminapp.error.exception.WrongCredentialException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,6 +29,7 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
       .map(token -> token.substring(AUTH_TOKEN_PREFIX.length()))
       .map(authToken -> new UsernamePasswordAuthenticationToken(authToken, authToken))
       .flatMap(authenticationManager::authenticate)
+      .switchIfEmpty(Mono.error(WrongCredentialException::new))
       .map(SecurityContextImpl::new);
   }
 
