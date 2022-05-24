@@ -9,5 +9,5 @@ public interface UserService {
   Flux<UserDto> getUsers();
   Mono<UserDto> getUser(String username);
   Mono<UserDto> updateUserData(UserDto userDto);
-  Mono<Void> deleteUser(String username);
+  Mono<UserDto> deleteUser(String username);
 }

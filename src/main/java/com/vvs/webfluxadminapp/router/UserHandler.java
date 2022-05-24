@@ -7,6 +7,7 @@ import com.vvs.webfluxadminapp.security.JwtUtil;
 import com.vvs.webfluxadminapp.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -42,7 +43,6 @@ public class UserHandler {
       .map(result -> !result)
       .map(isUsername -> username)
       .map(userService::getUser)
-      .switchIfEmpty(Mono.error(UserNotFoundException::new))
       .flatMap(user -> ServerResponse
         .ok()
         .contentType(APPLICATION_JSON)
@@ -59,12 +59,12 @@ public class UserHandler {
       .map(isUsername -> username)
       .map(userService::getUser)
       .switchIfEmpty(Mono.error(UserNotFoundException::new))
-      .flatMap(credentials -> userDto
-        .map(userService::updateUserData)
-        .flatMap(user -> ServerResponse
-          .ok()
-          .contentType(APPLICATION_JSON)
-          .body(user, UserDto.class)));
+      .flatMap(credentials -> userDto)
+      .map(userService::updateUserData)
+      .flatMap(user -> ServerResponse
+        .ok()
+        .contentType(APPLICATION_JSON)
+        .body(user, UserDto.class));
   }
 
   public Mono<ServerResponse> deleteUser(ServerRequest request) {
@@ -73,12 +73,11 @@ public class UserHandler {
     return jwtUtil.validateToken(token)
       .switchIfEmpty(Mono.error(WrongCredentialException::new))
       .map(result -> !result)
-      .flatMap(credentials -> Mono.just(username)
-        .map(userService::deleteUser)
-        .switchIfEmpty(Mono.error(UserNotFoundException::new))
-        .flatMap(user -> ServerResponse
-          .noContent()
-          .build()));
+      .map(isUsername -> username)
+      .flatMap(user -> ServerResponse
+        .ok()
+        .contentType(APPLICATION_JSON)
+        .body(userService.deleteUser(user), UserDto.class));
   }
   
 }

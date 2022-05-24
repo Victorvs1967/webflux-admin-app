@@ -59,9 +59,20 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public Mono<Void> deleteUser(String username) {
+  public Mono<UserDto> deleteUser(String username) {
     return userRepository.findUserByUsername(username)
-      .switchIfEmpty(Mono.error(UserNotFoundException::new))
-      .flatMap(userRepository::delete);
+    .switchIfEmpty(Mono.error(UserNotFoundException::new))
+      .flatMap(this::delete)
+      .map(userMapper::toDto);
   }
+
+  private Mono<User> delete(User user) {
+    return Mono.fromSupplier(() -> {
+      userRepository
+          .delete(user)
+          .subscribe();
+      return user;
+    });
+  }
+
 }
