@@ -7,14 +7,12 @@ import com.vvs.webfluxadminapp.security.JwtUtil;
 import com.vvs.webfluxadminapp.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 import reactor.core.publisher.Mono;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Component
 public class UserHandler {
@@ -31,7 +29,7 @@ public class UserHandler {
       .switchIfEmpty(Mono.error(WrongCredentialException::new))
       .flatMap(credentials -> ServerResponse
         .ok()
-        .contentType(APPLICATION_JSON)
+        .contentType(MediaType.APPLICATION_JSON)
         .body(userService.getUsers(), UserDto.class));
   }
 
@@ -45,7 +43,7 @@ public class UserHandler {
       .map(userService::getUser)
       .flatMap(user -> ServerResponse
         .ok()
-        .contentType(APPLICATION_JSON)
+        .contentType(MediaType.APPLICATION_JSON)
         .body(user, UserDto.class));
   }
 
@@ -63,7 +61,7 @@ public class UserHandler {
       .map(userService::updateUserData)
       .flatMap(user -> ServerResponse
         .ok()
-        .contentType(APPLICATION_JSON)
+        .contentType(MediaType.APPLICATION_JSON)
         .body(user, UserDto.class));
   }
 
@@ -76,7 +74,7 @@ public class UserHandler {
       .map(isUsername -> username)
       .flatMap(user -> ServerResponse
         .ok()
-        .contentType(APPLICATION_JSON)
+        .contentType(MediaType.APPLICATION_JSON)
         .body(userService.deleteUser(user), UserDto.class));
   }
   

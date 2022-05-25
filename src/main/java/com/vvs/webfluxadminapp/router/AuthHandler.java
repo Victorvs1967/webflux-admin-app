@@ -6,8 +6,6 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 
 import reactor.core.publisher.Mono;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-
 import com.vvs.webfluxadminapp.dto.LoginDto;
 import com.vvs.webfluxadminapp.dto.ResponseDto;
 import com.vvs.webfluxadminapp.dto.UserDto;
@@ -15,6 +13,7 @@ import com.vvs.webfluxadminapp.error.exception.WrongCredentialException;
 import com.vvs.webfluxadminapp.service.AuthService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 
 @Component
 public class AuthHandler {
@@ -29,7 +28,7 @@ public class AuthHandler {
 
     return ServerResponse
       .ok()
-      .contentType(APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
       .body(userDto, UserDto.class);
   }
 
@@ -40,7 +39,7 @@ public class AuthHandler {
 
     return ServerResponse
       .ok()
-      .contentType(APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
       .body(response, ResponseDto.class);
   }
 }
