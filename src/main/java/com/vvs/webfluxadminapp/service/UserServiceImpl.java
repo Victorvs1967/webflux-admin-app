@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
         .onCreate(user.getOnCreate())
         .onUpdate(Date.from(Instant.now()))
         .isActive(user.isActive())
-        .role(user.getRole())
+        .role(userDto.getRole())
         .build())
       .flatMap(userRepository::save)
       .map(userMapper::toDto);
