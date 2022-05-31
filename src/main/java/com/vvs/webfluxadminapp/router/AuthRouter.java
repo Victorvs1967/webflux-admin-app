@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 
 @Configuration
 public class AuthRouter {
-  
+
   @Bean
   public RouterFunction<ServerResponse> authRouterFunction(AuthHandler authHandler) {
     return RouterFunctions.route()
