@@ -42,6 +42,7 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public Mono<UserDto> signUp(UserDto userDto) {
     createAdmin();
+    
     return isUserExist(userDto.getUsername())
       .filter(userExist -> !userExist)
       .switchIfEmpty(Mono.error(UserAlreadyExistException::new))
@@ -88,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
 
     userRepository.findAll()
       .map(users -> users)
-      .switchIfEmpty(userRepository.save(user)).log("Admin created...")
+      .switchIfEmpty(userRepository.save(user))
       .subscribe();
   }
   

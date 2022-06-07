@@ -22,7 +22,6 @@ public class AuthHandler {
   private AuthService authService;
 
   public Mono<ServerResponse> signUp(ServerRequest request) {
-    // authService.createAdmin();
 
     Mono<UserDto> userDto = request.bodyToMono(UserDto.class)
       .flatMap(credentials -> authService.signUp(credentials))

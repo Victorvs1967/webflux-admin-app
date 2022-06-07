@@ -32,7 +32,7 @@ public class SecurityConfig {
     CorsConfiguration config = new CorsConfiguration();
 
     config.setAllowCredentials(true);
-    config.addAllowedOrigin("http://localhost:4200");
+    config.addAllowedOrigin("http://portfolio-dev.club:4200");
     config.addAllowedHeader("*");
     config.addAllowedMethod("*");
     source.registerCorsConfiguration("/**", config);
