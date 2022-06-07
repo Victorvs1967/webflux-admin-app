@@ -3,6 +3,7 @@ package com.vvs.webfluxadminapp.security;
 import com.vvs.webfluxadminapp.error.exception.WrongCredentialException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,9 @@ import reactor.core.publisher.Mono;
 
 @EnableWebFluxSecurity
 public class SecurityConfig {
+
+  @Value("${app.host.url}")
+  private String hostUrl;
   
   private final static String[] WHITELIST_AUTH_URLS = {"/auth/signup", "/auth/login"};
 
@@ -32,7 +36,7 @@ public class SecurityConfig {
     CorsConfiguration config = new CorsConfiguration();
 
     config.setAllowCredentials(true);
-    config.addAllowedOrigin("http://portfolio-dev.club:4200");
+    config.addAllowedOrigin(hostUrl);
     config.addAllowedHeader("*");
     config.addAllowedMethod("*");
     source.registerCorsConfiguration("/**", config);
