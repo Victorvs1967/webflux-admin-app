@@ -16,7 +16,8 @@ public class Project {
   @Id
   private String id;
   private String name;
-  private Skill[] skills;
   private String image;
   private String description;
+  private Skill[] skills;
+  private String[] links;
 }
