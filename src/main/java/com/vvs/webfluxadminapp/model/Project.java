@@ -20,4 +20,5 @@ public class Project {
   private String description;
   private Skill[] skills;
   private String[] links;
+  private String imgId;
 }

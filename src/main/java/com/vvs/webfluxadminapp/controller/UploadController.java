@@ -1,7 +1,5 @@
 package com.vvs.webfluxadminapp.controller;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 
 import org.springframework.data.mongodb.gridfs.ReactiveGridFsTemplate;
@@ -30,9 +28,6 @@ public class UploadController {
 
   private final ReactiveGridFsTemplate gridFsTemplate;
 
-  // private String uploadPath = "upload/images";
-  // private final Path basePath = Paths.get(uploadPath);
-
   @PostMapping("upload")
   public Mono<ResponseEntity<?>> upload(@RequestPart("file") Mono<FilePart> filePart) {
     return filePart
@@ -40,13 +35,11 @@ public class UploadController {
       .flatMap(fp -> gridFsTemplate.store(fp.content(), fp.filename()))
       .map(id -> ok()
       .body(Map.of("id", id.toHexString())));
-      // .flatMap(fp -> fp.transferTo(basePath.resolve(fp.filename())))
-      // .then();
   }
 
   @GetMapping("read/{id}")
   public Flux<Void> read(@PathVariable String id, ServerWebExchange exchange) {
-    return gridFsTemplate.findOne(query(where("_id").is(id))).log()
+    return gridFsTemplate.findOne(query(where("_id").is(id)))
       .flatMap(gridFsTemplate::getResource)
       .flatMapMany(r -> exchange.getResponse()
         .writeWith(r.getDownloadStream()));
