@@ -1,13 +1,11 @@
 package com.vvs.webfluxadminapp.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.vvs.webfluxadminapp.model.Project;
 import com.vvs.webfluxadminapp.repository.ProjectRepository;
 
-import io.netty.handler.codec.http.HttpExpectationFailedEvent;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -34,7 +32,7 @@ public class ProjectServiceImpl implements ProjectService {
   }
 
   @Override
-  public Mono<Project> updateProject(Project project) {
+  public Mono<Project> updateProject(String id) {
     return null;
   }
 

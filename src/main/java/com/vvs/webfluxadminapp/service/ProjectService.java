@@ -9,6 +9,6 @@ public interface ProjectService {
   Flux<Project> getProjects();
   Mono<Project> getProject(String id);
   Mono<Project> createProject(Project project);
-  Mono<Project> updateProject(Project project);
+  Mono<Project> updateProject(String id);
   Mono<Project> deleteProject(String id);
 }

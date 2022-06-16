@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class ProjectHandler {
-  
+
   @Autowired
   private ProjectService projectService;
   @Autowired
@@ -29,9 +29,9 @@ public class ProjectHandler {
   }
 
   public Mono<ServerResponse> createProject(ServerRequest request) {
-    Mono<Project> project = request.bodyToMono(Project.class)
+    Mono<Project> project = request
+      .bodyToMono(Project.class)
       .flatMap(projectService::createProject);
-
     return ServerResponse
       .ok()
       .contentType(MediaType.APPLICATION_JSON)
@@ -39,7 +39,9 @@ public class ProjectHandler {
   }
 
   public Mono<ServerResponse> deleteProject(ServerRequest request) {
-    String token = request.headers().firstHeader("authorization").substring(7);
+    String token = request
+      .headers()
+      .firstHeader("authorization").substring(7);
     String id = request.pathVariable("id");
     return jwtUtil.validateToken(token)
         .switchIfEmpty(Mono.error(WrongCredentialException::new))
@@ -50,6 +52,5 @@ public class ProjectHandler {
           .contentType(MediaType.APPLICATION_JSON)
           .body(projectService.deleteProject(id), Project.class));
   }
-
 
 }
