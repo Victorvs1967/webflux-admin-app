@@ -16,7 +16,8 @@ public class ProjectRouter {
       .nest(RequestPredicates.path("/api/projects"), builder -> builder
         .GET("", projectHandler::getProjects)
         .POST("", projectHandler::createProject)
-        .DELETE("/{id}", projectHandler::deleteProject))
+        .DELETE("/{id}", projectHandler::deleteProject)
+        .GET("read/{id}", projectHandler::readImg))
       .build();
   }
 }

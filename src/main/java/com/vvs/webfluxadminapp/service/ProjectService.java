@@ -11,4 +11,5 @@ public interface ProjectService {
   Mono<Project> createProject(Project project);
   Mono<Project> updateProject(String id);
   Mono<Project> deleteProject(String id);
+  Mono<Object> readImg(String id);
 }

@@ -1,6 +1,9 @@
 package com.vvs.webfluxadminapp.router;
 
+import java.util.Base64;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.buffer.DefaultDataBuffer;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -51,6 +54,15 @@ public class ProjectHandler {
           .ok()
           .contentType(MediaType.APPLICATION_JSON)
           .body(projectService.deleteProject(id), Project.class));
+  }
+
+  public Mono<ServerResponse> readImg(ServerRequest request) {
+    String id = request.pathVariable("id");
+    return projectService.readImg(id)
+    .flatMap(img -> ServerResponse
+      .ok()
+      .contentType(MediaType.IMAGE_JPEG)
+      .body(img, DefaultDataBuffer.class));
   }
 
 }
