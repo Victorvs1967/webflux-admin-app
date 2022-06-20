@@ -97,7 +97,7 @@ public class ProjectHandler {
         .body(BodyInserters.fromValue(Map.of("id", id.toHexString()))));
   }
 
-  public Mono<ServerResponse> loadImg(ServerRequest request) {
+  public Mono<ServerResponse> downloadImg(ServerRequest request) {
     return readImg(request.pathVariable("id"))
     .flatMap(img -> ServerResponse
       .ok()
