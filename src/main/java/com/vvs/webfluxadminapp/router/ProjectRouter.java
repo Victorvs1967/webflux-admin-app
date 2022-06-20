@@ -19,6 +19,7 @@ public class ProjectRouter {
         .POST("", projectHandler::createProject)
         .PUT("", projectHandler::editProject)
         .DELETE("/{id}", projectHandler::deleteProject)
+        .POST("/upload", projectHandler::upload)
         .GET("read/{id}", projectHandler::loadImg))
       .build();
   }

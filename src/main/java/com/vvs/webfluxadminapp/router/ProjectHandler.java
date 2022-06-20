@@ -4,7 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DefaultDataBuffer;
 import org.springframework.data.mongodb.gridfs.ReactiveGridFsTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.BodyExtractors;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
@@ -17,6 +20,9 @@ import com.vvs.webfluxadminapp.service.ProjectService;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.data.mongodb.core.query.Query.query;
+
+import java.util.Map;
+
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Component
@@ -79,6 +85,16 @@ public class ProjectHandler {
           .ok()
           .contentType(MediaType.APPLICATION_JSON)
           .body(projectService.deleteProject(id), ProjectDto.class));
+  }
+
+  public Mono<ServerResponse> upload(ServerRequest request) {
+    return request.body(BodyExtractors.toMultipartData())
+      .map(parts -> parts.toSingleValueMap())
+      .map(map -> (FilePart) map.get("file"))
+      .flatMap(part -> gridFsTemplate.store(part.content(), part.filename()))
+      .flatMap(id -> ServerResponse
+        .ok()
+        .body(BodyInserters.fromValue(Map.of("id", id.toHexString()))));
   }
 
   public Mono<ServerResponse> loadImg(ServerRequest request) {
