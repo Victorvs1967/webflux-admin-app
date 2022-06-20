@@ -1,20 +1,23 @@
 package com.vvs.webfluxadminapp.router;
 
-import java.util.Base64;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DefaultDataBuffer;
+import org.springframework.data.mongodb.gridfs.ReactiveGridFsTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+import com.vvs.webfluxadminapp.dto.ProjectDto;
 import com.vvs.webfluxadminapp.error.exception.WrongCredentialException;
 import com.vvs.webfluxadminapp.model.Project;
 import com.vvs.webfluxadminapp.security.JwtUtil;
 import com.vvs.webfluxadminapp.service.ProjectService;
 
 import reactor.core.publisher.Mono;
+
+import static org.springframework.data.mongodb.core.query.Query.query;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Component
 public class ProjectHandler {
@@ -23,6 +26,8 @@ public class ProjectHandler {
   private ProjectService projectService;
   @Autowired
   private JwtUtil jwtUtil;
+  @Autowired
+  private ReactiveGridFsTemplate gridFsTemplate;
 
   public Mono<ServerResponse> getProjects(ServerRequest request) {
     return ServerResponse
@@ -31,20 +36,40 @@ public class ProjectHandler {
       .body(projectService.getProjects(), Project.class);
   }
 
+  public Mono<ServerResponse> getProject(ServerRequest request) {
+    String token = request.headers().firstHeader("authorization").substring(7);
+    String id = request.pathVariable("id");
+    return jwtUtil.validateToken(token)
+        .switchIfEmpty(Mono.error(WrongCredentialException::new))
+        .map(result -> !result)
+        .map(isId -> id)
+        .map(projectService::getProject)
+        .flatMap(project -> ServerResponse
+            .ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(project, ProjectDto.class));
+  }
+
   public Mono<ServerResponse> createProject(ServerRequest request) {
-    Mono<Project> project = request
-      .bodyToMono(Project.class)
-      .flatMap(projectService::createProject);
-    return ServerResponse
-      .ok()
-      .contentType(MediaType.APPLICATION_JSON)
-      .body(project, Project.class);
+    return request.bodyToMono(ProjectDto.class)
+      .map(projectService::createProject)
+      .flatMap(project -> ServerResponse
+        .ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(project, ProjectDto.class));
+  }
+
+  public Mono<ServerResponse> editProject(ServerRequest request) {
+    return request.bodyToMono(ProjectDto.class)
+      .map(projectService::updateProject)
+      .flatMap(project -> ServerResponse
+        .ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(project, ProjectDto.class));
   }
 
   public Mono<ServerResponse> deleteProject(ServerRequest request) {
-    String token = request
-      .headers()
-      .firstHeader("authorization").substring(7);
+    String token = request.headers().firstHeader("authorization").substring(7);
     String id = request.pathVariable("id");
     return jwtUtil.validateToken(token)
         .switchIfEmpty(Mono.error(WrongCredentialException::new))
@@ -53,16 +78,21 @@ public class ProjectHandler {
         .flatMap(project -> ServerResponse
           .ok()
           .contentType(MediaType.APPLICATION_JSON)
-          .body(projectService.deleteProject(id), Project.class));
+          .body(projectService.deleteProject(id), ProjectDto.class));
   }
 
-  public Mono<ServerResponse> readImg(ServerRequest request) {
-    String id = request.pathVariable("id");
-    return projectService.readImg(id)
+  public Mono<ServerResponse> loadImg(ServerRequest request) {
+    return readImg(request.pathVariable("id"))
     .flatMap(img -> ServerResponse
       .ok()
       .contentType(MediaType.IMAGE_JPEG)
       .body(img, DefaultDataBuffer.class));
+  }
+
+  private Mono<?> readImg(String id) {
+    return gridFsTemplate.findOne(query(where("_id").is(id)))
+        .flatMap(gridFsTemplate::getResource)
+        .map(r -> r.getContent());
   }
 
 }

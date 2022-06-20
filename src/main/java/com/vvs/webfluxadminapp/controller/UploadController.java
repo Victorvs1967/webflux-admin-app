@@ -24,9 +24,7 @@ public class UploadController {
   @PostMapping("upload")
   public Mono<ResponseEntity<?>> upload(@RequestPart("file") Mono<FilePart> fileParts) {
     return fileParts
-      .doOnNext(part -> System.out.println("Recived file: " + part.filename()))
       .flatMap(part -> gridFsTemplate.store(part.content(), part.filename()))
-      .map(id -> ok()
-      .body(Map.of("id", id.toHexString())));
+      .map(id -> ok().body(Map.of("id", id.toHexString())));
   }
 }

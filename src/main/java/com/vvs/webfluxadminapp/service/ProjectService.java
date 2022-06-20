@@ -1,15 +1,14 @@
 package com.vvs.webfluxadminapp.service;
 
-import com.vvs.webfluxadminapp.model.Project;
+import com.vvs.webfluxadminapp.dto.ProjectDto;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface ProjectService {
-  Flux<Project> getProjects();
-  Mono<Project> getProject(String id);
-  Mono<Project> createProject(Project project);
-  Mono<Project> updateProject(String id);
-  Mono<Project> deleteProject(String id);
-  Mono<Object> readImg(String id);
+  Flux<ProjectDto> getProjects();
+  Mono<ProjectDto> getProject(String id);
+  Mono<ProjectDto> createProject(ProjectDto project);
+  Mono<ProjectDto> updateProject(ProjectDto project);
+  Mono<ProjectDto> deleteProject(String id);
 }

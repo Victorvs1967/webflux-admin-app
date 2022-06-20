@@ -1,63 +1,70 @@
 package com.vvs.webfluxadminapp.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.gridfs.ReactiveGridFsResource;
-import org.springframework.data.mongodb.gridfs.ReactiveGridFsTemplate;
 import org.springframework.stereotype.Service;
 
+import com.vvs.webfluxadminapp.dto.ProjectDto;
+import com.vvs.webfluxadminapp.mapper.ProjectMapper;
 import com.vvs.webfluxadminapp.model.Project;
 import com.vvs.webfluxadminapp.repository.ProjectRepository;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.data.mongodb.core.query.Query.query;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
   @Autowired
   private ProjectRepository projectRepository;
-
   @Autowired
-  private ReactiveGridFsTemplate gridFsTemplate;
+  private ProjectMapper projectMapper;
 
   @Override
-  public Flux<Project> getProjects() {
-    return projectRepository.findAll();
+  public Flux<ProjectDto> getProjects() {
+    return projectRepository.findAll()
+      .map(projectMapper::toDto);
   }
 
   @Override
-  public Mono<Project> getProject(String id) {
+  public Mono<ProjectDto> getProject(String id) {
     return projectRepository.findById(id)
-      .switchIfEmpty(Mono.empty());
+      .switchIfEmpty(Mono.empty())
+      .map(projectMapper::toDto);
   }
 
   @Override
-  public Mono<Project> createProject(Project project) {
-    return projectRepository.save(project);
+  public Mono<ProjectDto> createProject(ProjectDto projectDto) {
+    return Mono.just(projectDto)
+      .map(projectMapper::fromDto)
+      .flatMap(projectRepository::save)
+      .map(projectMapper::toDto);
   }
 
   @Override
-  public Mono<Project> updateProject(String id) {
-    return null;
+  public Mono<ProjectDto> updateProject(ProjectDto projectDto) {
+    return projectRepository.findById(projectDto.getId())
+      .switchIfEmpty(Mono.error(new RuntimeException("Project not found")))
+      .map(project -> Project.builder()
+        .id(projectDto.getId())
+        .name(projectDto.getName())
+        .description(projectDto.getDescription())
+        .image(projectDto.getImage())
+        .imgId(projectDto.getImgId())
+        .skills(projectDto.getSkills())
+        .links(projectDto.getLinks())
+        .build())
+      .flatMap(projectRepository::save)
+      .map(projectMapper::toDto);
   }
 
   @Override
-  public Mono<Project> deleteProject(String id) {
+  public Mono<ProjectDto> deleteProject(String id) {
     return projectRepository.findById(id)
       .switchIfEmpty(Mono.error(RuntimeException::new))
       .flatMap(this::delete)
-      .map(project -> project);
+      .map(projectMapper::toDto);
   }
 
-  // private Mono<Boolean> isProjectExist(String id) {
-  //   return projectRepository.findById(id)
-  //     .map(user -> true)
-  //     .switchIfEmpty(Mono.just(false));
-  // }
-  
   private Mono<Project> delete(Project project) {
     return Mono.fromSupplier(() -> {
       projectRepository
@@ -66,12 +73,4 @@ public class ProjectServiceImpl implements ProjectService {
       return project;
     });
   }
-
-  @Override
-  public Mono<Object> readImg(String id) {
-    return gridFsTemplate.findOne(query(where("_id").is(id)))
-      .flatMap(gridFsTemplate::getResource)
-      .map(r -> r.getContent());
-  }
-
 }
