@@ -15,7 +15,6 @@ public class ProjectMapperImpl implements ProjectMapper {
       .name(project.getName())
       .description(project.getDescription())
       .image(project.getImage())
-      .imgId(project.getImgId())
       .skills(project.getSkills())
       .links(project.getLinks())
       .build();
@@ -28,7 +27,6 @@ public class ProjectMapperImpl implements ProjectMapper {
       .name(projectDto.getName())
       .description(projectDto.getDescription())
       .image(projectDto.getImage())
-      .imgId(projectDto.getImgId())
       .skills(projectDto.getSkills())
       .links(projectDto.getLinks())
       .build();

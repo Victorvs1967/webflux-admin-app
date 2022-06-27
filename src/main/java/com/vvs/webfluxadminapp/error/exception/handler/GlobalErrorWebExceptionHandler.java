@@ -2,7 +2,6 @@ package com.vvs.webfluxadminapp.error.exception.handler;
 
 import java.util.Map;
 
-import com.vvs.webfluxadminapp.error.Error;
 import com.vvs.webfluxadminapp.error.ErrorAttributesKey;
 
 import org.springframework.boot.autoconfigure.web.WebProperties;
@@ -11,7 +10,6 @@ import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.stereotype.Component;

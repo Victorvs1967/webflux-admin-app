@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.vvs.webfluxadminapp.error.Error;
 import com.vvs.webfluxadminapp.error.ErrorAttributesKey;
 import com.vvs.webfluxadminapp.error.exception.EmailAlreadyExistException;
 import com.vvs.webfluxadminapp.error.exception.UserAlreadyExistException;

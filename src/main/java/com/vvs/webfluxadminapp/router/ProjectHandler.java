@@ -18,11 +18,9 @@ import com.vvs.webfluxadminapp.security.JwtUtil;
 import com.vvs.webfluxadminapp.service.ProjectService;
 
 import reactor.core.publisher.Mono;
-
-import static org.springframework.data.mongodb.core.query.Query.query;
-
 import java.util.Map;
 
+import static org.springframework.data.mongodb.core.query.Query.query;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Component
@@ -47,31 +45,30 @@ public class ProjectHandler {
     String id = request.pathVariable("id");
     return jwtUtil.validateToken(token)
         .switchIfEmpty(Mono.error(WrongCredentialException::new))
-        .map(result -> !result)
-        .map(isId -> id)
+        .map(result -> id)
         .map(projectService::getProject)
-        .flatMap(project -> ServerResponse
+        .flatMap(projectDto -> ServerResponse
             .ok()
             .contentType(MediaType.APPLICATION_JSON)
-            .body(project, ProjectDto.class));
+            .body(projectDto, ProjectDto.class));
   }
 
   public Mono<ServerResponse> createProject(ServerRequest request) {
     return request.bodyToMono(ProjectDto.class)
       .map(projectService::createProject)
-      .flatMap(project -> ServerResponse
+      .flatMap(projectDto -> ServerResponse
         .ok()
         .contentType(MediaType.APPLICATION_JSON)
-        .body(project, ProjectDto.class));
+        .body(projectDto, ProjectDto.class));
   }
 
   public Mono<ServerResponse> editProject(ServerRequest request) {
     return request.bodyToMono(ProjectDto.class)
       .map(projectService::updateProject)
-      .flatMap(project -> ServerResponse
+      .flatMap(projectDto -> ServerResponse
         .ok()
         .contentType(MediaType.APPLICATION_JSON)
-        .body(project, ProjectDto.class));
+        .body(projectDto, ProjectDto.class));
   }
 
   public Mono<ServerResponse> deleteProject(ServerRequest request) {
@@ -79,12 +76,12 @@ public class ProjectHandler {
     String id = request.pathVariable("id");
     return jwtUtil.validateToken(token)
         .switchIfEmpty(Mono.error(WrongCredentialException::new))
-        .map(result -> !result)
-        .map(isProjectId -> id)
-        .flatMap(project -> ServerResponse
+        .map(result -> id)
+        .map(projectService::deleteProject)
+        .flatMap(projectDto -> ServerResponse
           .ok()
           .contentType(MediaType.APPLICATION_JSON)
-          .body(projectService.deleteProject(id), ProjectDto.class));
+          .body(projectDto, ProjectDto.class));
   }
 
   public Mono<ServerResponse> upload(ServerRequest request) {

@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+import com.vvs.webfluxadminapp.dto.SkillDto;
 import com.vvs.webfluxadminapp.error.exception.WrongCredentialException;
-import com.vvs.webfluxadminapp.model.Skill;
 import com.vvs.webfluxadminapp.security.JwtUtil;
 import com.vvs.webfluxadminapp.service.SkillService;
 
@@ -25,30 +25,46 @@ public class SkillHandler {
     return ServerResponse
       .ok()
       .contentType(MediaType.APPLICATION_JSON)
-      .body(skillService.getSkills(), Skill.class);
+      .body(skillService.getSkills(), SkillDto.class);
+  }
+
+  public Mono<ServerResponse> getSkill(ServerRequest request) {
+    return request.bodyToMono(SkillDto.class)
+      .map(skillService::updateSkill)
+      .flatMap(skilDto -> ServerResponse
+        .ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(skilDto, SkillDto.class));
   }
 
   public Mono<ServerResponse> createSkill(ServerRequest request) {
-    Mono<Skill> skill = request.bodyToMono(Skill.class)
-      .flatMap(skillService::createSkill);
+    return request.bodyToMono(SkillDto.class)
+      .map(skillService::createSkill)
+      .flatMap(skill -> ServerResponse
+        .ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(skill, SkillDto.class));
+  }
 
-    return ServerResponse
-      .ok()
-      .contentType(MediaType.APPLICATION_JSON)
-      .body(skill, Skill.class);
+  public Mono<ServerResponse> updateSkill(ServerRequest request) {
+    return request.bodyToMono(SkillDto.class)
+      .map(skillService::createSkill)
+      .flatMap(skill -> ServerResponse
+        .ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(skill, SkillDto.class));
   }
 
   public Mono<ServerResponse> deleteSkill(ServerRequest request) {
     String token = request.headers().firstHeader("authorization").substring(7);
     String id = request.pathVariable("id");
-
     return jwtUtil.validateToken(token)
       .switchIfEmpty(Mono.error(WrongCredentialException::new))
-      .map(result -> !result)
-      .map(isProjectId -> id)
-      .flatMap(project -> ServerResponse
+      .map(result -> id)
+      .map(skillService::deleteSkill)
+      .flatMap(skillDto -> ServerResponse
         .ok()
         .contentType(MediaType.APPLICATION_JSON)
-        .body(skillService.deleteSkill(id), Skill.class));
+        .body(skillDto, SkillDto.class));
   }
 }

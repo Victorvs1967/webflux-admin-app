@@ -1,6 +1,6 @@
 package com.vvs.webfluxadminapp.security;
 
-import com.vvs.webfluxadminapp.error.exception.WrongCredentialException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +37,7 @@ public class SecurityConfig {
 
     config.setAllowCredentials(true);
     config.addAllowedOrigin(hostUrl);
+    config.addAllowedOrigin("http://portfolio-dev.club");
     config.addAllowedHeader("*");
     config.addAllowedMethod("*");
     source.registerCorsConfiguration("/**", config);

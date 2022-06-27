@@ -15,8 +15,10 @@ public class SkillRouter {
     return RouterFunctions.route()
       .nest(RequestPredicates.path("/api/skills"), builder -> builder
         .GET("", skillHandler::getSkills)
+        .GET("/{id}", skillHandler::getSkill)
         .POST("", skillHandler::createSkill)
-        .DELETE("{id}", skillHandler::deleteSkill))
+        .PUT("", skillHandler::updateSkill)
+        .DELETE("/{id}", skillHandler::deleteSkill))
       .build();
   }
   

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vvs.webfluxadminapp.dto.ProjectDto;
+import com.vvs.webfluxadminapp.error.exception.ProjectNotFoundException;
 import com.vvs.webfluxadminapp.mapper.ProjectMapper;
 import com.vvs.webfluxadminapp.model.Project;
 import com.vvs.webfluxadminapp.repository.ProjectRepository;
@@ -43,13 +44,12 @@ public class ProjectServiceImpl implements ProjectService {
   @Override
   public Mono<ProjectDto> updateProject(ProjectDto projectDto) {
     return projectRepository.findById(projectDto.getId())
-      .switchIfEmpty(Mono.error(new RuntimeException("Project not found")))
+      .switchIfEmpty(Mono.error(ProjectNotFoundException::new))
       .map(project -> Project.builder()
-        .id(projectDto.getId())
+        .id(project.getId())
         .name(projectDto.getName())
         .description(projectDto.getDescription())
         .image(projectDto.getImage())
-        .imgId(projectDto.getImgId())
         .skills(projectDto.getSkills())
         .links(projectDto.getLinks())
         .build())
@@ -60,7 +60,7 @@ public class ProjectServiceImpl implements ProjectService {
   @Override
   public Mono<ProjectDto> deleteProject(String id) {
     return projectRepository.findById(id)
-      .switchIfEmpty(Mono.error(RuntimeException::new))
+      .switchIfEmpty(Mono.error(ProjectNotFoundException::new))
       .flatMap(this::delete)
       .map(projectMapper::toDto);
   }
