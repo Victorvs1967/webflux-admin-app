@@ -31,28 +31,28 @@ public class SkillHandler {
   public Mono<ServerResponse> getSkill(ServerRequest request) {
     return request.bodyToMono(SkillDto.class)
       .map(skillService::updateSkill)
-      .flatMap(skilDto -> ServerResponse
+      .flatMap(skillDto -> ServerResponse
         .ok()
         .contentType(MediaType.APPLICATION_JSON)
-        .body(skilDto, SkillDto.class));
+        .body(skillDto, SkillDto.class));
   }
 
   public Mono<ServerResponse> createSkill(ServerRequest request) {
     return request.bodyToMono(SkillDto.class)
       .map(skillService::createSkill)
-      .flatMap(skill -> ServerResponse
+      .flatMap(skillDto -> ServerResponse
         .ok()
         .contentType(MediaType.APPLICATION_JSON)
-        .body(skill, SkillDto.class));
+        .body(skillDto, SkillDto.class));
   }
 
   public Mono<ServerResponse> updateSkill(ServerRequest request) {
     return request.bodyToMono(SkillDto.class)
-      .map(skillService::createSkill)
-      .flatMap(skill -> ServerResponse
+      .map(skillService::updateSkill)
+      .flatMap(skillDto -> ServerResponse
         .ok()
         .contentType(MediaType.APPLICATION_JSON)
-        .body(skill, SkillDto.class));
+        .body(skillDto, SkillDto.class));
   }
 
   public Mono<ServerResponse> deleteSkill(ServerRequest request) {
