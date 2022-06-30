@@ -22,18 +22,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.server.ResponseStatusException;
 
-// record ExceptionRule(Class<?> exceptionClass, Error status) {}
 record ExceptionRule(Class<?> exceptionClass, HttpStatus status) {}
 
 @Component
 public class GlobalErrorAttributes extends DefaultErrorAttributes {
 
-  // private final List<ExceptionRule> exceptionRules = List.of(
-  //   new ExceptionRule(UserNotFoundException.class, Error.USER_NOT_FOUND),
-  //   new ExceptionRule(WrongCredentialException.class, Error.WRONG_CREDENTIALS),
-  //   new ExceptionRule(UserAlreadyExistException.class, Error.USER_ALREADY_EXIST),
-  //   new ExceptionRule(EmailAlreadyExistException.class, Error.EMAIL_ALREADY_EXIST)
-  // );
   private final List<ExceptionRule> exceptionRules = List.of(
     new ExceptionRule(UserNotFoundException.class, HttpStatus.NOT_FOUND),
     new ExceptionRule(WrongCredentialException.class, HttpStatus.UNAUTHORIZED),

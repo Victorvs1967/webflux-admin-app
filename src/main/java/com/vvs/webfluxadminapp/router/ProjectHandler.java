@@ -2,12 +2,9 @@ package com.vvs.webfluxadminapp.router;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DefaultDataBuffer;
-import org.springframework.data.mongodb.gridfs.ReactiveGridFsTemplate;
 import org.springframework.http.MediaType;
-import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyExtractors;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
@@ -20,9 +17,6 @@ import com.vvs.webfluxadminapp.service.ProjectService;
 import reactor.core.publisher.Mono;
 import java.util.Map;
 
-import static org.springframework.data.mongodb.core.query.Query.query;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-
 @Component
 public class ProjectHandler {
 
@@ -30,8 +24,6 @@ public class ProjectHandler {
   private ProjectService projectService;
   @Autowired
   private JwtUtil jwtUtil;
-  @Autowired
-  private ReactiveGridFsTemplate gridFsTemplate;
 
   public Mono<ServerResponse> getProjects(ServerRequest request) {
     return ServerResponse
@@ -44,13 +36,13 @@ public class ProjectHandler {
     String token = request.headers().firstHeader("authorization").substring(7);
     String id = request.pathVariable("id");
     return jwtUtil.validateToken(token)
-        .switchIfEmpty(Mono.error(WrongCredentialException::new))
-        .map(result -> id)
-        .map(projectService::getProject)
-        .flatMap(projectDto -> ServerResponse
-            .ok()
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(projectDto, ProjectDto.class));
+      .switchIfEmpty(Mono.error(WrongCredentialException::new))
+      .map(result -> id)
+      .map(projectService::getProject)
+      .flatMap(projectDto -> ServerResponse
+          .ok()
+          .contentType(MediaType.APPLICATION_JSON)
+          .body(projectDto, ProjectDto.class));
   }
 
   public Mono<ServerResponse> createProject(ServerRequest request) {
@@ -75,37 +67,29 @@ public class ProjectHandler {
     String token = request.headers().firstHeader("authorization").substring(7);
     String id = request.pathVariable("id");
     return jwtUtil.validateToken(token)
-        .switchIfEmpty(Mono.error(WrongCredentialException::new))
-        .map(result -> id)
-        .map(projectService::deleteProject)
-        .flatMap(projectDto -> ServerResponse
-          .ok()
-          .contentType(MediaType.APPLICATION_JSON)
-          .body(projectDto, ProjectDto.class));
+      .switchIfEmpty(Mono.error(WrongCredentialException::new))
+      .map(result -> id)
+      .map(projectService::deleteProject)
+      .flatMap(projectDto -> ServerResponse
+        .ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(projectDto, ProjectDto.class));
   }
 
-  public Mono<ServerResponse> upload(ServerRequest request) {
+  public Mono<ServerResponse> uploadImg(ServerRequest request) {
     return request.body(BodyExtractors.toMultipartData())
-      .map(parts -> parts.toSingleValueMap())
-      .map(map -> (FilePart) map.get("file"))
-      .flatMap(part -> gridFsTemplate.store(part.content(), part.filename()))
+      .map(projectService::upload)
       .flatMap(id -> ServerResponse
         .ok()
-        .body(BodyInserters.fromValue(Map.of("id", id.toHexString()))));
+        .body(id, Map.class));
   }
 
   public Mono<ServerResponse> downloadImg(ServerRequest request) {
-    return readImg(request.pathVariable("id"))
-    .flatMap(img -> ServerResponse
-      .ok()
-      .contentType(MediaType.IMAGE_JPEG)
-      .body(img, DefaultDataBuffer.class));
-  }
-
-  private Mono<?> readImg(String id) {
-    return gridFsTemplate.findOne(query(where("_id").is(id)))
-        .flatMap(gridFsTemplate::getResource)
-        .map(r -> r.getContent());
+    return projectService.read(request.pathVariable("id"))
+      .flatMap(img -> ServerResponse
+        .ok()
+        .contentType(MediaType.IMAGE_JPEG)
+        .body(img, DefaultDataBuffer.class));
   }
 
 }
