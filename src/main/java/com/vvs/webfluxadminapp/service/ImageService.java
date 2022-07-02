@@ -11,6 +11,6 @@ import reactor.core.publisher.Mono;
 public interface ImageService {
   Mono<Map<String, String>> upload(MultiValueMap<String, Part> file);
   Mono<?> download(String id);
-  public Mono<Void> delete(String id);
-  public Flux<Map<String, String>> listFiles();
+  Mono<Void> delete(String id);
+  Flux<Map<String, String>> listFiles();
 }

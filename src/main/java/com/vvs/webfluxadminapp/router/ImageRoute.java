@@ -8,17 +8,16 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 @Configuration
-public class ProjectRouter {
+public class ImageRoute {
   
   @Bean
-  public RouterFunction<ServerResponse> projectRouterFunction(ProjectHandler projectHandler) {
+  public RouterFunction<ServerResponse> imageRouterFunction(ImageHandler imageHandler) {
     return RouterFunctions.route()
-      .nest(RequestPredicates.path("/api/projects"), builder -> builder
-        .GET("", projectHandler::getProjects)
-        .GET("/{id}", projectHandler::getProject)
-        .POST("", projectHandler::createProject)
-        .PUT("", projectHandler::editProject)
-        .DELETE("/{id}", projectHandler::deleteProject))
+      .nest(RequestPredicates.path("/api/images"), builder -> builder
+        .POST("/upload", imageHandler::uploadImg)
+        .GET("/download/{id}", imageHandler::downloadImg)
+        .GET("", imageHandler::listImg)
+        .DELETE("/{id}", imageHandler::deleteImg))
       .build();
-  }
+}
 }
