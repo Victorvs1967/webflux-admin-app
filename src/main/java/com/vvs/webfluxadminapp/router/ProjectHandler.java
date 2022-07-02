@@ -12,9 +12,12 @@ import com.vvs.webfluxadminapp.dto.ProjectDto;
 import com.vvs.webfluxadminapp.error.exception.WrongCredentialException;
 import com.vvs.webfluxadminapp.model.Project;
 import com.vvs.webfluxadminapp.security.JwtUtil;
+import com.vvs.webfluxadminapp.service.ImageService;
 import com.vvs.webfluxadminapp.service.ProjectService;
 
 import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
 import java.util.Map;
 
 @Component
@@ -22,6 +25,8 @@ public class ProjectHandler {
 
   @Autowired
   private ProjectService projectService;
+  @Autowired
+  private ImageService imageService;
   @Autowired
   private JwtUtil jwtUtil;
 
@@ -78,18 +83,31 @@ public class ProjectHandler {
 
   public Mono<ServerResponse> uploadImg(ServerRequest request) {
     return request.body(BodyExtractors.toMultipartData())
-      .map(projectService::upload)
+      .map(imageService::upload)
       .flatMap(id -> ServerResponse
         .ok()
         .body(id, Map.class));
   }
 
   public Mono<ServerResponse> downloadImg(ServerRequest request) {
-    return projectService.read(request.pathVariable("id"))
+    return imageService.download(request.pathVariable("id"))
       .flatMap(img -> ServerResponse
         .ok()
         .contentType(MediaType.IMAGE_JPEG)
         .body(img, DefaultDataBuffer.class));
   }
 
+  public Mono<ServerResponse> listImg(ServerRequest request) {
+    return ServerResponse
+        .ok()
+        .contentType(MediaType.IMAGE_JPEG)
+        .body(imageService.listFiles(), ArrayList.class);
+  }
+
+  public Mono<ServerResponse> deleteImg(ServerRequest request) {
+    return ServerResponse
+      .ok()
+      .contentType(MediaType.APPLICATION_JSON)
+      .body(imageService.delete(request.pathVariable("id")), Void.class);
+  }
 }

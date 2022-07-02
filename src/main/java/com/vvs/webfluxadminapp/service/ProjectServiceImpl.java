@@ -1,14 +1,8 @@
 package com.vvs.webfluxadminapp.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.gridfs.ReactiveGridFsTemplate;
-import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.http.codec.multipart.Part;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import com.vvs.webfluxadminapp.dto.ProjectDto;
 import com.vvs.webfluxadminapp.error.exception.ProjectNotFoundException;
 import com.vvs.webfluxadminapp.mapper.ProjectMapper;
@@ -18,12 +12,6 @@ import com.vvs.webfluxadminapp.repository.ProjectRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.data.mongodb.core.query.Query.query;
-
-import java.util.Map;
-
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
@@ -31,8 +19,6 @@ public class ProjectServiceImpl implements ProjectService {
   private ProjectRepository projectRepository;
   @Autowired
   private ProjectMapper projectMapper;
-  @Autowired
-  private ReactiveGridFsTemplate gridFsTemplate;
 
   @Override
   public Flux<ProjectDto> getProjects() {
@@ -87,26 +73,4 @@ public class ProjectServiceImpl implements ProjectService {
       return project;
     });
   }
-
-  @Override
-  public Mono<Map<String, String>> upload(MultiValueMap<String, Part> file) {
-    DBObject metadata = new BasicDBObject();
-    metadata.put("fileSize", file.size());
-    metadata.put("_contentType", "JPEG");
-
-    return Mono.just(file)
-        .map(parts -> parts.toSingleValueMap())
-        .map(map -> (FilePart) map.get("file"))
-        .flatMap(part -> gridFsTemplate.store(part.content(), part.filename(), metadata))
-        .map(id -> Map.of("id", id.toHexString()))
-        .map(_id -> _id);
-  }
-
-  @Override
-  public Mono<?> read(String id) {
-    return gridFsTemplate.findOne(query(where("_id").is(id)))
-        .flatMap(gridFsTemplate::getResource)
-        .map(r -> r.getContent());
-  }
-
 }

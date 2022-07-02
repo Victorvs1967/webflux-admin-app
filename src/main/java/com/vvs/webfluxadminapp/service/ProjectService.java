@@ -16,6 +16,4 @@ public interface ProjectService {
   Mono<ProjectDto> createProject(ProjectDto project);
   Mono<ProjectDto> updateProject(ProjectDto project);
   Mono<ProjectDto> deleteProject(String id);
-  Mono<Map<String, String>> upload(MultiValueMap<String, Part> file);
-  Mono<?> read(String id);
 }
