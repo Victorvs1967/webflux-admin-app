@@ -38,8 +38,6 @@ public class ImageHandler {
   }
 
   public Mono<ServerResponse> listImg(ServerRequest request) {
-    imageService.listFiles()
-        .subscribe(l -> System.out.println(l));
     return ServerResponse
       .ok()
       .contentType(MediaType.APPLICATION_JSON)
