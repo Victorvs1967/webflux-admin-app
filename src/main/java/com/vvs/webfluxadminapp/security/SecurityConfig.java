@@ -22,7 +22,7 @@ public class SecurityConfig {
   @Value("${app.host.url}")
   private String hostUrl;
   
-  private final static String[] WHITELIST_AUTH_URLS = {"/auth/signup", "/auth/login"};
+  private final static String[] WHITELIST_AUTH_URLS = {"/auth/signup", "/auth/login", "/main/home"};
 
   @Autowired
   private AuthenticationManager authenticationManager;
