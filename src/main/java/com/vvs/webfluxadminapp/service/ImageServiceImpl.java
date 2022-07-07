@@ -27,7 +27,6 @@ public class ImageServiceImpl implements ImageService {
   @Override
   public Mono<Map<String, String>> upload(MultiValueMap<String, Part> file) {
     DBObject metadata = new BasicDBObject();
-    metadata.put("fileSize", file.size());
     metadata.put("_contentType", "image/ipeg");
 
     return Mono.just(file)

@@ -49,6 +49,8 @@ public class UserServiceImpl implements UserService {
         .lastName(userDto.getLastName())
         .phone(userDto.getPhone())
         .address(userDto.getAddress())
+        .photo(userDto.getPhoto())
+        .avatar(userDto.getAvatar())
         .onCreate(user.getOnCreate())
         .onUpdate(Date.from(Instant.now()))
         .isActive(user.isActive())

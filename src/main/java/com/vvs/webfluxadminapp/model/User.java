@@ -32,6 +32,9 @@ public class User implements UserDetails {
   private String phone;
   private String address;
 
+  private Image photo;
+  private Image avatar;
+
   private Date onCreate;
   private Date onUpdate;
   private  boolean isActive;

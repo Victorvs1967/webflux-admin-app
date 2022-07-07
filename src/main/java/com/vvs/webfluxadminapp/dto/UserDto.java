@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.vvs.webfluxadminapp.model.Image;
 import com.vvs.webfluxadminapp.model.UserRole;
 
 import lombok.AllArgsConstructor;
@@ -28,6 +29,8 @@ public class UserDto {
   private String lastName;
   private String phone;
   private String address;
+  private Image photo;
+  private Image avatar;
 
   private Date onCreate;
   private Date onUpdate;
