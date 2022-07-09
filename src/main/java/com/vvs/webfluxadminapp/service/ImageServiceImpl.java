@@ -52,7 +52,6 @@ public class ImageServiceImpl implements ImageService {
   @Override
   public Flux<Map<String, String>> listFiles() {
     return gridFsTemplate.find(new Query())
-      .map(file -> Map.of(file.getObjectId().toHexString(), file.getFilename()));
+      .map(file -> Map.of("id", file.getObjectId().toHexString(), "name", file.getFilename()));
   }
-
 }

@@ -15,4 +15,5 @@ import lombok.NoArgsConstructor;
 public class Image {
   private String id;
   private String name;
+  private String type;
 }
